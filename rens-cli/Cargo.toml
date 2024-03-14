@@ -1,0 +1,9 @@
+[package]
+name = "rens-cli"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.2", features = ["derive"] }
+rens-common = { path = "../rens-common" }
+thiserror = "1.0.58"

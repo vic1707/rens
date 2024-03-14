@@ -1,3 +1,2 @@
 [workspace]
-
-members = ["rens-common"]
+members = ["rens-cli", "rens-common", "rens-tui"]
