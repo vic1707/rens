@@ -1,0 +1,8 @@
+[package]
+name = "rens-common"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+regex = "1.10.3"
+thiserror = "1.0.58"
