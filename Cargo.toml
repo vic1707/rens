@@ -1,2 +1,3 @@
 [workspace]
 members = ["rens-cli", "rens-common", "rens-tui"]
+resolver = "2"

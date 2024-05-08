@@ -2,10 +2,11 @@
 name = "rens-tui"
 version = "0.0.0"
 edition = "2021"
+rust-version = "1.74.1"
 
 [dependencies]
-clap = { version = "4.5.2", features = ["derive"] }
+clap = { version = "4.5.4", features = ["derive"] }
 crossterm = "0.27.0"
-ratatui = "0.26.1"
+ratatui = "0.26.3"
 rens-common = { path = "../rens-common" }
-thiserror = "1.0.58"
+thiserror = "1.0.61"
