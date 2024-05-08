@@ -13,6 +13,8 @@ rustflags = [
   "-Aclippy::self_named_module_files",           # clippy::mod_module_files           - `./foo.rs` + `./foo/*.rs` instead of `./foo/mod.rs`
   "-Aclippy::separated_literal_suffix",          # clippy::unseparated-literal-suffix - 2.0_f32 vs 2.0f32
   ## Allowed ##
+  "-Aclippy::arithmetic_side_effects",          # maths are fun
+  "-Aclippy::error_impl_error",                 # else we get clippy::module_name_repetitions
   "-Aclippy::missing_trait_methods",            # convenience
   "-Aclippy::question_mark_used",               # convenience
   "-Aclippy::print_stdout",
