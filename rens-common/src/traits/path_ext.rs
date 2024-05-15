@@ -1,5 +1,3 @@
-/* Clippy config */
-#![allow(clippy::pattern_type_mismatch)]
 /* Built-in imports */
 #[cfg(unix)]
 use std::os::unix::fs::FileTypeExt;
@@ -7,9 +5,9 @@ use std::os::unix::fs::FileTypeExt;
 use std::os::windows::fs::FileTypeExt;
 use std::{fs, io, path::Path};
 /* Dependencies */
-use derive_more::{Display, IsVariant};
+use derive_more::Display;
 
-#[derive(Debug, Display, IsVariant)]
+#[derive(Debug, Display)]
 #[non_exhaustive]
 pub enum Kind {
     File,
