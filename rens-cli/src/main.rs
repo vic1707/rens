@@ -27,13 +27,12 @@ fn main() -> anyhow::Result<()> {
         confirmations,
         canonicalize,
         ..
-    } = CliOptions::parse()
-        .tap(|options| {
-            env_logger::Builder::new()
-                .filter_level(options.verbose.log_level_filter())
-                .init();
-        })
-        .tap(|options| debug!("{options:#?}"));
+    } = CliOptions::parse().tap(|options| {
+        env_logger::Builder::new()
+            .filter_level(options.verbose.log_level_filter())
+            .init();
+        debug!("{options:#?}");
+    });
 
     let rens_renamer = match mode {
         Mode::Regex {
