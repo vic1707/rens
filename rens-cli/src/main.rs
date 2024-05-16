@@ -25,6 +25,7 @@ fn main() -> anyhow::Result<()> {
         target,
         paths,
         confirmations,
+        canonicalize,
         ..
     } = CliOptions::parse()
         .tap(|options| {
@@ -54,6 +55,12 @@ fn main() -> anyhow::Result<()> {
 
     let ok_targets = paths
         .into_iter()
+        // Cannonicalize if asked
+        .map_if(
+            |_| canonicalize,
+            #[allow(clippy::expect_used)] // ensured in path parsing
+            |path| dunce::canonicalize(path).expect("Canonicalization failed"),
+        )
         // Build the rename informations
         .map::<anyhow::Result<RensTarget>, _>(|path| {
             let filename = FileName::from_path(path.clone())?;

@@ -8,6 +8,7 @@ rust-version = "1.74.1"
 anyhow = "1.0.83"
 clap = { version = "4.5.4", features = ["derive"] }
 clap-verbosity-flag = "2.2.0"
+dunce = "1.0.4"
 env_logger = "0.11.3"
 log = "0.4.21"
 regex = "1.10.4"
