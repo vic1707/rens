@@ -1,5 +1,3 @@
-/* Clippy config */
-#![allow(clippy::pattern_type_mismatch)]
 /* Modules */
 pub mod traits;
 mod file_name;
