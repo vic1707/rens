@@ -6,14 +6,13 @@ mod rens_target;
 use std::io::{self, Write};
 use std::path::PathBuf;
 /* Crate imports */
-use rens_common::{traits::IteratorExt, FileName, Renamer};
+use rens_common::{traits::IteratorExt, FileName, Strategy};
 use rens_target::RensTarget;
 /* Dependencies */
 use anyhow::anyhow;
 use clap::Parser;
-use cli_options::{CliOptions, ConfirmOption, Mode};
+use cli_options::{CliOptions, ConfirmOption};
 use log::{debug, error};
-use regex::Regex;
 use tap::{Pipe, Tap};
 
 use crate::cli_options::OverrideOption;
@@ -34,23 +33,7 @@ fn main() -> anyhow::Result<()> {
         debug!("{options:#?}");
     });
 
-    let rens_renamer = match mode {
-        Mode::Regex {
-            pattern,
-            with,
-            options,
-        } => Renamer::new(pattern, with, options.occurence.into(), target),
-        Mode::String {
-            pattern,
-            with,
-            options,
-        } => Renamer::new(
-            Regex::new(&regex::escape(&pattern))?,
-            with,
-            options.occurence.into(),
-            target,
-        ),
-    };
+    let strategy: Strategy = mode.into();
 
     let ok_targets = paths
         .into_iter()
@@ -68,7 +51,7 @@ fn main() -> anyhow::Result<()> {
                 .map(PathBuf::from)
                 .ok_or_else(|| anyhow!("No parent for {} !", path.display()))?;
 
-            let renamed = rens_renamer.to_renamed_file(&filename);
+            let renamed = filename.to_renamed(&strategy, target);
             Ok(RensTarget {
                 path,
                 filename,

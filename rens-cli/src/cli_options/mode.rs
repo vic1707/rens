@@ -3,6 +3,7 @@ use super::utils::GlobalOrNumbered;
 /* Dependencies */
 use clap::{Args, Subcommand};
 use regex::Regex;
+use rens_common::Strategy;
 
 #[derive(Debug, Subcommand)]
 pub enum Mode {
@@ -26,6 +27,28 @@ pub enum Mode {
         #[command(flatten)]
         options: PatternOptions,
     },
+}
+
+impl Into<Strategy> for Mode {
+    fn into(self) -> Strategy {
+        match self {
+            Self::Regex {
+                pattern,
+                with,
+                options,
+            } => Strategy::new(pattern, with, options.occurence.into()),
+            Self::String {
+                pattern,
+                with,
+                options,
+            } => Strategy::new(
+                // safety guarenteed by [`regex::escape`]
+                Regex::new(&regex::escape(&pattern)).expect("Unable to build regex."),
+                with,
+                options.occurence.into(),
+            ),
+        }
+    }
 }
 
 #[derive(Debug, Args)]

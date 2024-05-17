@@ -4,6 +4,8 @@ use std::{ffi::OsStr, io, path::Path};
 /* Dependencies */
 use derive_more::{Constructor, Display, FromStr};
 
+use crate::Strategy;
+
 #[derive(Debug, Constructor, PartialEq, Eq)]
 pub struct FileName {
     stem: String,
@@ -21,6 +23,43 @@ impl FileName {
     #[must_use]
     pub const fn extension(&self) -> &Option<String> {
         &self.extension
+    }
+
+    #[inline]
+    #[must_use]
+    pub fn to_renamed(&self, strat: &Strategy, target: RenameTarget) -> Self {
+        match target {
+            RenameTarget::Both => {
+                let file_name = self.to_string();
+                let renamed = strat.pattern.replacen(
+                    &file_name,
+                    strat.limit,
+                    &strat.with,
+                );
+                match renamed.rsplit_once('.') {
+                    Some((stem, ext)) => {
+                        Self::new(stem.to_owned(), Some(ext.to_owned()))
+                    },
+                    None => Self::new(renamed.to_string(), None),
+                }
+            },
+            RenameTarget::Stem => Self::new(
+                strat
+                    .pattern
+                    .replacen(self.stem(), strat.limit, &strat.with)
+                    .to_string(),
+                self.extension().clone(),
+            ),
+            RenameTarget::Extension => Self::new(
+                self.stem().clone(),
+                self.extension().clone().map(|ext| {
+                    strat
+                        .pattern
+                        .replacen(&ext, strat.limit, &strat.with)
+                        .to_string()
+                }),
+            ),
+        }
     }
 
     #[inline]
