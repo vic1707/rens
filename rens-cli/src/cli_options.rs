@@ -37,7 +37,7 @@ pub struct CliOptions {
     /// Canonicalize all paths instead of using relative ones.
     #[arg(
         global = true,
-        long, short,
+        long,
         default_value_t = false,
         action = ArgAction::SetTrue
     )]
