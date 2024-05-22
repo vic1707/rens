@@ -1,15 +1,12 @@
+/* Built-in imports */
 use core::iter::Map;
 
-pub trait IteratorExt: Iterator {
+pub trait IteratorExt: Iterator + Sized {
     #[inline]
-    fn i_tap<F>(
+    fn tap_for_each(
         self,
-        func: F,
-    ) -> Map<Self, impl FnMut(Self::Item) -> Self::Item>
-    where
-        Self: Sized,
-        F: Fn(&Self::Item),
-    {
+        func: impl Fn(&Self::Item),
+    ) -> Map<Self, impl FnMut(Self::Item) -> Self::Item> {
         self.map(move |item| {
             func(&item);
             item
@@ -17,16 +14,11 @@ pub trait IteratorExt: Iterator {
     }
 
     #[inline]
-    fn map_if<P, F>(
+    fn map_if(
         self,
-        mut predicate: P,
-        mut func: F,
-    ) -> Map<Self, impl FnMut(Self::Item) -> Self::Item>
-    where
-        Self: Sized,
-        P: FnMut(&Self::Item) -> bool,
-        F: FnMut(Self::Item) -> Self::Item,
-    {
+        mut predicate: impl FnMut(&Self::Item) -> bool,
+        mut func: impl FnMut(Self::Item) -> Self::Item,
+    ) -> Map<Self, impl FnMut(Self::Item) -> Self::Item> {
         self.map(move |item| if predicate(&item) { func(item) } else { item })
     }
 }

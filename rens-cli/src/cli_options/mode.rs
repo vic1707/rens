@@ -29,20 +29,21 @@ pub enum Mode {
     },
 }
 
-impl Into<Strategy> for Mode {
-    fn into(self) -> Strategy {
-        match self {
-            Self::Regex {
+impl From<Mode> for Strategy {
+    fn from(val: Mode) -> Self {
+        match val {
+            Mode::Regex {
                 pattern,
                 with,
                 options,
-            } => Strategy::new(pattern, with, options.occurence.into()),
-            Self::String {
+            } => Self::new(pattern, with, options.occurence.into()),
+            Mode::String {
                 pattern,
                 with,
                 options,
-            } => Strategy::new(
+            } => Self::new(
                 // safety guarenteed by [`regex::escape`]
+                #[allow(clippy::expect_used)]
                 Regex::new(&regex::escape(&pattern)).expect("Unable to build regex."),
                 with,
                 options.occurence.into(),

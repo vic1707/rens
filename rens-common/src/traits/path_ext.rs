@@ -7,7 +7,7 @@ use std::{fs, io, path::Path};
 /* Dependencies */
 use derive_more::Display;
 
-#[derive(Debug, Display)]
+#[derive(Debug, Display, PartialEq, Eq, Clone, Copy)]
 #[non_exhaustive]
 pub enum Kind {
     File,

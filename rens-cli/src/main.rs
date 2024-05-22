@@ -1,13 +1,13 @@
 #![allow(clippy::shadow_unrelated)]
 /* Modules */
 mod cli_options;
-mod rens_target;
 /* Built-in imports */
 use std::io::{self, Write};
-use std::path::PathBuf;
 /* Crate imports */
-use rens_common::{traits::IteratorExt, FileName, Strategy};
-use rens_target::RensTarget;
+use rens_common::{
+    traits::{IteratorExt, ResultIteratorExt},
+    File, Strategy,
+};
 /* Dependencies */
 use anyhow::anyhow;
 use clap::Parser;
@@ -24,7 +24,7 @@ fn main() -> anyhow::Result<()> {
         target,
         paths,
         confirmations,
-        canonicalize,
+        canonicalize_paths,
         ..
     } = CliOptions::parse().tap(|options| {
         env_logger::Builder::new()
@@ -35,52 +35,32 @@ fn main() -> anyhow::Result<()> {
 
     let strategy: Strategy = mode.into();
 
-    let ok_targets = paths
+    let files = paths
         .into_iter()
-        // Cannonicalize if asked
         .map_if(
-            |_| canonicalize,
-            #[allow(clippy::expect_used)] // ensured in path parsing
+            |_| canonicalize_paths,
+            // ensured in path parsing
+            #[allow(clippy::expect_used)]
             |path| dunce::canonicalize(path).expect("Canonicalization failed"),
         )
-        // Build the rename informations
-        .map::<anyhow::Result<RensTarget>, _>(|path| {
-            let filename = FileName::from_path(path.clone())?;
-            let target_dir = path
-                .parent()
-                .map(PathBuf::from)
-                .ok_or_else(|| anyhow!("No parent for {} !", path.display()))?;
-
-            let renamed = filename.to_renamed(&strategy, target);
-            Ok(RensTarget {
-                path,
-                filename,
-                renamed,
-                target_dir,
-            })
-        })
-        // Filter out the errors (and log them)
-        .filter(|target_res| match *target_res {
-            Ok(_) => true,
-            Err(ref err) => {
-                error!("{err}");
-                false
-            },
-        })
-        .map(Result::unwrap)
+        .map(File::from_path)
+        .filter_map_ok(|err| error!("{err}"))
         // Filter those for which nothing needs to be done
-        .filter(|target| {
-            let will_rename = target.original_path() != target.renamed_path();
+        .filter(|file| {
+            let will_rename = file.needs_rename(&strategy, target);
             if !will_rename {
-                println!(
-                    "Nothing to do for {}",
-                    target.original_path().display()
-                );
+                println!("Nothing to do for {}", file.path().display());
             }
             will_rename
         })
         // Log every rename that can be done
-        .i_tap(|target| println!("{}", target.rename_prompt()))
+        .tap_for_each(|file| {
+            println!(
+                "{} -> {}",
+                file.path().display(),
+                file.renamed_name(&strategy, target)
+            );
+        })
         // If needed, ask for confirmation
         .filter(|_| {
             (!matches!(confirmations.confirm, ConfirmOption::Each))
@@ -95,23 +75,21 @@ fn main() -> anyhow::Result<()> {
         return Err(anyhow!("Canceled..."));
     }
 
-    ok_targets
+    files
         .into_iter()
         // Check overrides and ask if necessary
-        .filter(|target| {
-            if target.renamed_path().exists() {
-                confirmations
-                    .allow_override
-                    .can_override(&target.rename_prompt())
+        .filter(|file| {
+            if file.renamed_path(&strategy, target).exists() {
+                confirmations.allow_override.can_override(&format!(
+                    "{} -> {}",
+                    file.path().display(),
+                    file.renamed_name(&strategy, target)
+                ))
             } else {
                 true
             }
         })
-        // Does the actual rename
-        .map(RensTarget::rename)
-        // Log the errors
-        .filter(Result::is_err)
-        .map(Result::unwrap_err)
+        .filter_map(|file| file.rename(&strategy, target).err())
         .for_each(|err| error!("{err}"));
 
     Ok(())

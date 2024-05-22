@@ -1,11 +1,11 @@
 /* Modules */
 pub mod traits;
-mod file_name;
+mod file;
 /* Dependencies */
 use derive_more::{Constructor, Display};
 use regex::Regex;
 /* Re-exports */
-pub use file_name::{FileName, RenameTarget};
+pub use file::{File, RenameTarget};
 
 #[derive(Debug, Display, Constructor)]
 #[display("{pattern}\n{with}\n{limit}")]

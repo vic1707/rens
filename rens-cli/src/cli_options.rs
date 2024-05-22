@@ -41,7 +41,7 @@ pub struct CliOptions {
         default_value_t = false,
         action = ArgAction::SetTrue
     )]
-    pub canonicalize: bool,
+    pub canonicalize_paths: bool,
 
     /// Weather to rename the file stem, extension or both.
     #[arg(
