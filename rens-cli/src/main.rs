@@ -20,11 +20,12 @@ use crate::cli_options::OverrideOption;
 fn main() -> anyhow::Result<()> {
     let CliOptions {
         mode,
+        allow_hidden,
+        canonicalize_paths,
+        confirmations,
         recursion,
         target,
         paths,
-        confirmations,
-        canonicalize_paths,
         ..
     } = CliOptions::parse().tap(|options| {
         env_logger::Builder::new()
