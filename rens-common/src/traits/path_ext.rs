@@ -48,10 +48,12 @@ pub trait PathExt: AsRef<Path> {
     #[inline]
     #[cfg(unix)]
     fn is_hidden(&self) -> bool {
+        use std::ffi::OsStr;
+
         self.as_ref()
             .file_name()
             .map(OsStr::to_string_lossy)
-            .is_some_and(|str| str.starts_with('.'));
+            .is_some_and(|name| name.starts_with('.'))
     }
 
     #[inline]
