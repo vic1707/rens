@@ -21,13 +21,13 @@ pub trait ResultIteratorExt<T, E>:
     #[inline]
     fn filter_err(
         self,
-    ) -> FilterMap<Self, impl FnMut(Self::Item) -> Option<T>> {
-        self.filter_map(Result::ok)
+    ) -> FilterMap<Self, impl FnMut(Self::Item) -> Option<E>> {
+        self.filter_map(Result::err)
     }
 
     #[inline]
-    fn filter_ok(self) -> FilterMap<Self, impl FnMut(Self::Item) -> Option<E>> {
-        self.filter_map(Result::err)
+    fn filter_ok(self) -> FilterMap<Self, impl FnMut(Self::Item) -> Option<T>> {
+        self.filter_map(Result::ok)
     }
 }
 
