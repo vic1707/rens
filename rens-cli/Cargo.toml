@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.74.1"
 
 [dependencies]
-anyhow = "1.0.83"
+anyhow = "1.0.86"
 clap = { version = "4.5.4", features = ["derive"] }
 clap-verbosity-flag = "2.2.0"
 dunce = "1.0.4"
@@ -14,4 +14,4 @@ log = "0.4.21"
 regex = "1.10.4"
 rens-common = { path = "../rens-common" }
 tap = "1.0.1"
-thiserror = "1.0.60"
+thiserror = "1.0.61"
