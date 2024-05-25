@@ -43,15 +43,6 @@ pub struct CliOptions {
     )]
     pub canonicalize_paths: bool,
 
-    /// When traversing directories, include hidden files.
-    #[arg(
-        global = true,
-        long, short,
-        default_value_t = false,
-        action = ArgAction::SetTrue
-    )]
-    pub allow_hidden: bool,
-
     /// Weather to rename the file stem, extension or both.
     #[arg(
         global = true,

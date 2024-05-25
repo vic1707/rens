@@ -2,14 +2,17 @@
 /* Modules */
 mod cli_options;
 /* Built-in imports */
-use std::io::{self, Write};
+use std::{
+    fs,
+    io::{self, Write},
+    path::{Path, PathBuf},
+};
 /* Crate imports */
 use rens_common::{
-    traits::{IteratorExt, ResultIteratorExt},
+    traits::{IteratorExt, PathExt, ResultIteratorExt},
     File, Strategy,
 };
 /* Dependencies */
-use anyhow::anyhow;
 use clap::Parser;
 use cli_options::{CliOptions, ConfirmOption};
 use log::{debug, error};
@@ -17,10 +20,9 @@ use tap::{Pipe, Tap};
 
 use crate::cli_options::OverrideOption;
 
-fn main() -> anyhow::Result<()> {
+fn main() {
     let CliOptions {
         mode,
-        allow_hidden,
         canonicalize_paths,
         confirmations,
         recursion,
@@ -38,6 +40,16 @@ fn main() -> anyhow::Result<()> {
 
     let files = paths
         .into_iter()
+        // remove dir paths if recursive mode is disabled
+        .filter(|path| recursion.recursive || !path.is_dir())
+        // if recursive mode is enabled turn all dir paths into their child files paths
+        .flat_map(|path| {
+            if path.is_dir() {
+                traverse_dir(path, recursion.depth, recursion.allow_hidden)
+            } else {
+                vec![path]
+            }
+        })
         .map_if(
             |_| canonicalize_paths,
             // ensured in path parsing
@@ -73,7 +85,7 @@ fn main() -> anyhow::Result<()> {
     if matches!(confirmations.confirm, ConfirmOption::Once)
         && !ask_for_confirm("All good ?")
     {
-        return Err(anyhow!("Canceled..."));
+        return println!("Canceled...");
     }
 
     files
@@ -92,8 +104,6 @@ fn main() -> anyhow::Result<()> {
         })
         .filter_map(|file| file.rename(&strategy, target).err())
         .for_each(|err| error!("{err}"));
-
-    Ok(())
 }
 
 #[allow(clippy::expect_used)]
@@ -123,4 +133,32 @@ impl OverrideOption {
             },
         }
     }
+}
+
+#[allow(clippy::expect_used)]
+fn traverse_dir<P: AsRef<Path>>(
+    path: P,
+    depth: u8,
+    allow_hidden: bool,
+) -> Vec<PathBuf> {
+    debug_assert!(path.as_ref().is_dir(), "Cannot traverse a non directory");
+    if depth == 0 {
+        return vec![];
+    }
+
+    fs::read_dir(path)
+        .map(|dir| {
+            dir.filter_ok()
+                .filter(|entry| allow_hidden || !entry.path().is_hidden())
+                .map(|entry| entry.path())
+                .flat_map(|path| {
+                    if path.is_dir() {
+                        traverse_dir(path, depth - 1, allow_hidden)
+                    } else {
+                        vec![path]
+                    }
+                })
+                .collect()
+        })
+        .expect("msg")
 }
