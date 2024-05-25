@@ -8,17 +8,15 @@ use std::{
     path::{Path, PathBuf},
 };
 /* Crate imports */
+use cli_options::{CliOptions, ConfirmOption, OverrideOption};
 use rens_common::{
     traits::{IteratorExt, PathExt, ResultIteratorExt},
     File, Strategy,
 };
 /* Dependencies */
 use clap::Parser;
-use cli_options::{CliOptions, ConfirmOption};
 use log::{debug, error};
 use tap::{Pipe, Tap};
-
-use crate::cli_options::OverrideOption;
 
 fn main() {
     let CliOptions {
