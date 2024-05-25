@@ -16,8 +16,8 @@ pub trait IteratorExt: Iterator + Sized {
     #[inline]
     fn map_if(
         self,
-        mut predicate: impl FnMut(&Self::Item) -> bool,
-        mut mapper: impl FnMut(Self::Item) -> Self::Item,
+        predicate: impl Fn(&Self::Item) -> bool,
+        mapper: impl Fn(Self::Item) -> Self::Item,
     ) -> Map<Self, impl FnMut(Self::Item) -> Self::Item> {
         self.map(move |item| if predicate(&item) { mapper(item) } else { item })
     }
