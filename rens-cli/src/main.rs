@@ -41,13 +41,13 @@ fn main() {
         // remove dir paths if recursive mode is disabled
         .filter(|path| recursion.recursive || !path.is_dir())
         // if recursive mode is enabled turn all dir paths into their child files paths
-        .flat_map(|path| {
-            if path.is_dir() {
+        .flat_map_if(
+            |path| path.is_dir(),
+            |path| {
                 traverse_dir(path, recursion.depth, recursion.allow_hidden)
-            } else {
-                vec![path]
-            }
-        })
+                    .into_iter()
+            },
+        )
         .map_if(
             |_| canonicalize_paths,
             // ensured in path parsing
@@ -140,23 +140,21 @@ fn traverse_dir<P: AsRef<Path>>(
     allow_hidden: bool,
 ) -> Vec<PathBuf> {
     debug_assert!(path.as_ref().is_dir(), "Cannot traverse a non directory");
-    if depth == 0 {
-        return vec![];
-    }
 
-    fs::read_dir(path)
-        .map(|dir| {
-            dir.filter_ok()
-                .filter(|entry| allow_hidden || !entry.path().is_hidden())
-                .map(|entry| entry.path())
-                .flat_map(|path| {
-                    if path.is_dir() {
-                        traverse_dir(path, depth - 1, allow_hidden)
-                    } else {
-                        vec![path]
-                    }
-                })
-                .collect()
-        })
-        .expect("msg")
+    match fs::read_dir(&path) {
+        Ok(dir_entry) => dir_entry
+            .filter_map_ok(|err| error!("{err:#?}"))
+            .map(|entry| entry.path())
+            .filter(|path| allow_hidden || !path.is_hidden())
+            .filter(|path| !(path.is_dir() && depth == 0))
+            .flat_map_if(
+                |path| path.is_dir(),
+                |path| traverse_dir(path, depth - 1, allow_hidden).into_iter(),
+            )
+            .collect(),
+        Err(err) => {
+            error!("{}: {err}", path.as_ref().display());
+            vec![]
+        },
+    }
 }
