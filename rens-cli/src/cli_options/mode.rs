@@ -44,7 +44,8 @@ impl From<Mode> for Strategy {
             } => Self::new(
                 // safety guarenteed by [`regex::escape`]
                 #[allow(clippy::expect_used)]
-                Regex::new(&regex::escape(&pattern)).expect("Unable to build regex."),
+                Regex::new(&regex::escape(&pattern))
+                    .expect("Unable to build regex."),
                 with,
                 options.occurence.into(),
             ),

@@ -25,7 +25,7 @@ pub struct Confirmations {
         require_equals = true,
         num_args = 0..=1,
     )]
-    pub confirm: ConfirmOption
+    pub confirm: ConfirmOption,
 }
 
 #[derive(Debug, Clone, ValueEnum)]

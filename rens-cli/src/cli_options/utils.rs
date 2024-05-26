@@ -29,7 +29,8 @@ impl ValueEnum for GlobalOrNumbered {
                 PossibleValue::new("Global").help("Replace all found matches."),
             ),
             Self::Numbered(_) => Some(
-                PossibleValue::new("<number>").help("Replace <number> matches."),
+                PossibleValue::new("<number>")
+                    .help("Replace <number> matches."),
             ),
         }
     }

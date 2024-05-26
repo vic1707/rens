@@ -1,6 +1,6 @@
 /* Modules */
-pub mod traits;
 mod file;
+pub mod traits;
 /* Dependencies */
 use derive_more::{Constructor, Display};
 use regex::Regex;
