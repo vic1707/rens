@@ -105,7 +105,9 @@ mod tests {
     #[test]
     fn test_confirm() {
         assert_eq!(
-            TestParser::parse_from(["rens-cli", "--confirm"]).confirmations.confirm,
+            TestParser::parse_from(["rens-cli", "--confirm"])
+                .confirmations
+                .confirm,
             ConfirmOption::Once
         );
 

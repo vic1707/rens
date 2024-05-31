@@ -58,11 +58,7 @@ mod tests {
 
     #[test]
     fn test_recursive_flag() {
-        assert!(
-            TestParser::parse_from(["test-cli", "-r"])
-                .options
-                .recursive
-        );
+        assert!(TestParser::parse_from(["test-cli", "-r"]).options.recursive);
 
         assert!(
             TestParser::parse_from(["test-cli", "--recursive"])

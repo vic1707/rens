@@ -36,7 +36,11 @@ impl From<Mode> for Strategy {
                 pattern,
                 with,
                 options,
-            } => Self::new(pattern, with, options.occurence.map_or(0, usize::from)),
+            } => Self::new(
+                pattern,
+                with,
+                options.occurence.map_or(0, usize::from),
+            ),
             Mode::String {
                 pattern,
                 with,
