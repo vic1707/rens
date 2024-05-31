@@ -76,6 +76,23 @@ impl Name {
             },
         }
     }
+
+    #[inline]
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
+        let stem = path
+            .as_ref()
+            .file_stem()
+            .and_then(OsStr::to_str)
+            .map(ToString::to_string)
+            .ok_or(Error::NoFileStem)?;
+        let extension = path
+            .as_ref()
+            .extension()
+            .and_then(OsStr::to_str)
+            .map(ToString::to_string);
+
+        Ok(Self::new(stem, extension))
+    }
 }
 
 #[derive(Debug, Constructor, PartialEq, Eq)]
@@ -116,21 +133,9 @@ impl File {
         let file_path = path.as_ref();
         let parent = file_path.parent().ok_or(Error::NoParent)?.to_path_buf();
         let kind = file_path.kind()?;
-        let stem = file_path
-            .file_stem()
-            .and_then(OsStr::to_str)
-            .map(ToString::to_string)
-            .ok_or(Error::NoFileStem)?;
-        let extension = file_path
-            .extension()
-            .and_then(OsStr::to_str)
-            .map(ToString::to_string);
+        let name = Name::from_path(file_path)?;
 
-        Ok(Self {
-            name: Name::new(stem, extension),
-            kind,
-            parent,
-        })
+        Ok(Self { name, kind, parent })
     }
 
     #[inline]
@@ -229,9 +234,9 @@ mod tests {
         ];
 
         for path in PATHS {
-            let file = File::from_path(path).unwrap();
+            let name = Name::from_path(path).unwrap();
             assert_eq!(
-                file.name().to_string(),
+                name.to_string(),
                 Path::new(path).file_name().unwrap().to_string_lossy()
             );
         }

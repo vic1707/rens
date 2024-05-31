@@ -2,7 +2,6 @@
 mod confirmations;
 mod mode;
 mod recursion;
-pub mod utils;
 /* Built-in imports */
 use std::{io, path::PathBuf};
 /* Dependencies */
