@@ -74,13 +74,13 @@ fn main() {
         })
         // If needed, ask for confirmation
         .filter(|_| {
-            (!matches!(confirmations.confirm, ConfirmOption::Each))
+            (confirmations.confirm == ConfirmOption::Each)
                 || ask_for_confirm("Ok to rename?")
         })
         .pipe(Iterator::collect::<Vec<_>>);
 
     // If needed, ask for global confirmation
-    if matches!(confirmations.confirm, ConfirmOption::Once)
+    if confirmations.confirm == ConfirmOption::Once
         && !ask_for_confirm("All good ?")
     {
         return println!("Canceled...");

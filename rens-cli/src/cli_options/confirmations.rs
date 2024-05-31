@@ -28,7 +28,7 @@ pub struct Confirmations {
     pub confirm: ConfirmOption,
 }
 
-#[derive(Debug, Clone, ValueEnum)]
+#[derive(Debug, Clone, ValueEnum, PartialEq, Eq)]
 pub enum OverrideOption {
     #[clap(help = "Ask for every change.")]
     Ask,
@@ -38,7 +38,7 @@ pub enum OverrideOption {
     Deny,
 }
 
-#[derive(Debug, Clone, ValueEnum)]
+#[derive(Debug, Clone, ValueEnum, PartialEq, Eq)]
 pub enum ConfirmOption {
     #[clap(help = "Ask for every change.")]
     Each,
@@ -46,4 +46,88 @@ pub enum ConfirmOption {
     Once,
     #[clap(help = "Always allow.")]
     Never,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::{CommandFactory, Parser};
+
+    #[derive(Debug, Parser)]
+    struct TestParser {
+        #[command(flatten)]
+        pub confirmations: Confirmations,
+    }
+
+    #[test]
+    fn confirmations_are_valid() {
+        TestParser::command().debug_assert();
+    }
+
+    #[test]
+    fn test_default_values() {
+        let args = TestParser::parse_from::<[_; 0], &str>([]);
+        assert_eq!(args.confirmations.allow_override, OverrideOption::Ask);
+        assert_eq!(args.confirmations.confirm, ConfirmOption::Each);
+    }
+
+    #[test]
+    fn test_allow_override() {
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--allow-override"])
+                .confirmations
+                .allow_override,
+            OverrideOption::Allow
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--allow-override=ask"])
+                .confirmations
+                .allow_override,
+            OverrideOption::Ask
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--allow-override=allow"])
+                .confirmations
+                .allow_override,
+            OverrideOption::Allow
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--allow-override=deny"])
+                .confirmations
+                .allow_override,
+            OverrideOption::Deny
+        );
+    }
+
+    #[test]
+    fn test_confirm() {
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--confirm"]).confirmations.confirm,
+            ConfirmOption::Once
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--confirm=each"])
+                .confirmations
+                .confirm,
+            ConfirmOption::Each
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--confirm=never"])
+                .confirmations
+                .confirm,
+            ConfirmOption::Never
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--confirm=once"])
+                .confirmations
+                .confirm,
+            ConfirmOption::Once
+        );
+    }
 }

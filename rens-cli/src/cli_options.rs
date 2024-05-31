@@ -75,3 +75,14 @@ fn path_exists(input: &str) -> io::Result<PathBuf> {
         ))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::CommandFactory;
+
+    #[test]
+    fn verify_conformity() {
+        CliOptions::command().debug_assert();
+    }
+}
