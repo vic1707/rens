@@ -19,6 +19,7 @@ use log::{debug, error};
 use tap::{Pipe, Tap};
 
 fn main() {
+    #[allow(clippy::unneeded_field_pattern)] // prefer explicitness
     let CliOptions {
         mode,
         canonicalize_paths,
@@ -26,7 +27,7 @@ fn main() {
         recursion,
         target,
         paths,
-        ..
+        verbose: _,
     } = CliOptions::parse().tap(|options| {
         env_logger::Builder::new()
             .filter_level(options.verbose.log_level_filter())
@@ -34,7 +35,7 @@ fn main() {
         debug!("{options:#?}");
     });
 
-    let strategy: Strategy = mode.into();
+    let strategy = Strategy::from(mode);
 
     let files = paths
         .into_iter()
@@ -110,7 +111,9 @@ fn ask_for_confirm(prompt: &str) -> bool {
         print!("{prompt} (yes/no): ");
         let mut input = String::new();
         io::stdout().lock().flush().expect("Failed to flush stdin.");
-        io::stdin().read_line(&mut input).expect("Failed to stdin.");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read stdin.");
 
         match input.trim().to_lowercase().as_str() {
             "yes" | "y" => return true,
@@ -133,7 +136,6 @@ impl OverrideOption {
     }
 }
 
-#[allow(clippy::expect_used)]
 fn traverse_dir<P: AsRef<Path>>(
     path: P,
     depth: u8,
