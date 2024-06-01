@@ -1,15 +1,13 @@
-/* Clippy config */
-#![allow(clippy::pattern_type_mismatch)]
 /* Built-in imports */
 #[cfg(unix)]
 use std::os::unix::fs::FileTypeExt;
 #[cfg(windows)]
-use std::os::windows::fs::FileTypeExt;
+use std::os::windows::fs::{FileTypeExt, MetadataExt};
 use std::{fs, io, path::Path};
 /* Dependencies */
-use derive_more::{Display, IsVariant};
+use derive_more::Display;
 
-#[derive(Debug, Display, IsVariant)]
+#[derive(Debug, Display, PartialEq, Eq, Clone, Copy)]
 #[non_exhaustive]
 pub enum Kind {
     File,
@@ -20,11 +18,7 @@ pub enum Kind {
     Other,
 }
 
-pub trait PathExt {
-    fn kind(&self) -> io::Result<Kind>;
-}
-
-impl<P: AsRef<Path>> PathExt for P {
+pub trait PathExt: AsRef<Path> {
     #[inline]
     fn kind(&self) -> io::Result<Kind> {
         let metadata = fs::symlink_metadata(self)?;
@@ -50,4 +44,29 @@ impl<P: AsRef<Path>> PathExt for P {
 
         Ok(Kind::Other)
     }
+
+    #[inline]
+    #[cfg(unix)]
+    fn is_hidden(&self) -> bool {
+        use std::ffi::OsStr;
+
+        self.as_ref()
+            .file_name()
+            .map(OsStr::to_string_lossy)
+            .is_some_and(|name| name.starts_with('.'))
+    }
+
+    #[inline]
+    #[cfg(windows)]
+    fn is_hidden(&self) -> bool {
+        /// See: <https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants>
+        const FILE_ATTRIBUTE_HIDDEN: u32 = 0x0000_0002;
+
+        self.as_ref()
+            .metadata()
+            .map(|metadata| metadata.file_attributes())
+            .is_ok_and(|attr| attr & FILE_ATTRIBUTE_HIDDEN != 0)
+    }
 }
+
+impl<P: AsRef<Path>> PathExt for P {}
