@@ -75,8 +75,8 @@ fn main() {
         })
         // If needed, ask for confirmation
         .filter(|_| {
-            (confirmations.confirm == ConfirmOption::Each)
-                || ask_for_confirm("Ok to rename?")
+            confirmations.confirm == ConfirmOption::Each
+                && ask_for_confirm("Ok to rename?")
         })
         .pipe(Iterator::collect::<Vec<_>>);
 
