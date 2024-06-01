@@ -20,6 +20,11 @@ pub struct Cli {
 pub enum Commands {
     #[command(flatten)]
     Renaming(Mode),
+    /// Generate shell completions
+    Completions {
+        /// The shell to generate the completions for
+        shell: clap_complete_command::Shell,
+    },
 }
 
 #[cfg(test)]

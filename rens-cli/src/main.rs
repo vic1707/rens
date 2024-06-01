@@ -2,6 +2,8 @@
 /* Modules */
 mod cli;
 mod utils;
+/* Built-in imports */
+use std::io;
 /* Crate imports */
 use cli::{
     renaming::{ConfirmOption, Options},
@@ -9,7 +11,7 @@ use cli::{
 };
 use utils::{ask_for_confirm, traverse_dir};
 /* Dependencies */
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 use log::{debug, error};
 use rens_common::{
     traits::{IteratorExt, ResultIteratorExt},
@@ -29,6 +31,9 @@ fn main() {
     });
 
     match command {
+        Commands::Completions { shell } => {
+            shell.generate(&mut Cli::command(), &mut io::stdout());
+        },
         Commands::Renaming(mode) => {
             let (
                 strategy,
