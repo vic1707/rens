@@ -2,7 +2,7 @@
 use core::num::NonZeroUsize;
 /* Dependencies */
 use clap::{Args, Subcommand};
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 use rens_common::Strategy;
 
 #[derive(Debug, Subcommand)]
@@ -33,26 +33,34 @@ impl From<Mode> for Strategy {
     fn from(val: Mode) -> Self {
         match val {
             Mode::Regex {
-                pattern,
+                mut pattern,
                 with,
                 options,
-            } => Self::new(
-                pattern,
-                with,
-                options.occurence.map_or(0, usize::from),
-            ),
+            } => {
+                let limit = options.occurence.map_or(0, usize::from);
+                if options.case_insensitive {
+                    pattern = to_regex_case_insensitive(&pattern);
+                }
+
+                Self::new(pattern, with, limit)
+            },
             Mode::String {
                 pattern,
                 with,
                 options,
-            } => Self::new(
+            } => {
+                let limit = options.occurence.map_or(0, usize::from);
                 // safety guarenteed by [`regex::escape`]
                 #[allow(clippy::expect_used)]
-                Regex::new(&regex::escape(&pattern))
-                    .expect("Unable to build regex."),
-                with,
-                options.occurence.map_or(0, usize::from),
-            ),
+                let mut regex_pattern = Regex::new(&regex::escape(&pattern))
+                    .expect("Unable to build regex.");
+
+                if options.case_insensitive {
+                    regex_pattern = to_regex_case_insensitive(&regex_pattern);
+                }
+
+                Self::new(regex_pattern, with, limit)
+            },
         }
     }
 }
@@ -69,6 +77,14 @@ pub struct PatternOptions {
     #[arg(global = true, long, short, value_name = "number of repetitions")]
     // Note: None gets used as `All`.
     pub occurence: Option<NonZeroUsize>,
+}
+
+#[allow(clippy::expect_used)]
+fn to_regex_case_insensitive(regex: &Regex) -> Regex {
+    RegexBuilder::new(regex.as_str())
+        .case_insensitive(true)
+        .build()
+        .expect("Failed to build case insensitive Regex.")
 }
 
 #[cfg(test)]
