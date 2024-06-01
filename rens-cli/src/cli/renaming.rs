@@ -5,7 +5,7 @@ use clap::Subcommand;
 use regex::{Regex, RegexBuilder};
 use rens_common::Strategy;
 /* Re-exports */
-pub use self::options::{Options, ConfirmOption, OverrideOption};
+pub use self::options::{ConfirmOption, Options, OverrideOption};
 
 #[derive(Debug, Subcommand)]
 pub enum Mode {
