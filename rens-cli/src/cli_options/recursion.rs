@@ -16,10 +16,9 @@ pub struct Recursion {
     pub recursive: bool,
 
     /// If recursive mode is enabled, decides how deep the renaming goes.
-    ///
-    /// Note: 0 means as deep as possible.
-    #[arg(global = true, long, default_value_t = 1, value_name = "depth")]
-    pub depth: u8,
+    #[arg(global = true, long, value_name = "depth")]
+    // Note: None gets used as `As deep as possible`.
+    pub depth: Option<usize>,
 
     /// When traversing directories, include hidden files.
     #[arg(
@@ -52,7 +51,7 @@ mod tests {
         let args = TestParser::parse_from::<[_; 0], &str>([]);
 
         assert!(!args.options.recursive);
-        assert_eq!(args.options.depth, 1);
+        assert_eq!(args.options.depth, None);
         assert!(!args.options.allow_hidden);
     }
 
@@ -69,8 +68,11 @@ mod tests {
 
     #[test]
     fn test_depth() {
+        // should fail if no value provided
+        TestParser::try_parse_from(["rens-cli", "--depth"]).unwrap_err();
+
         let args = TestParser::parse_from(["test-cli", "--depth", "5"]);
-        assert_eq!(args.options.depth, 5);
+        assert_eq!(args.options.depth, Some(5));
         assert!(args.options.recursive);
     }
 

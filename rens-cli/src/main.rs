@@ -138,7 +138,7 @@ impl OverrideOption {
 
 fn traverse_dir<P: AsRef<Path>>(
     path: P,
-    depth: u8,
+    depth: Option<usize>,
     allow_hidden: bool,
 ) -> Vec<PathBuf> {
     debug_assert!(path.as_ref().is_dir(), "Cannot traverse a non directory");
@@ -148,10 +148,13 @@ fn traverse_dir<P: AsRef<Path>>(
             .filter_map_ok(|err| error!("{err:#?}"))
             .map(|entry| entry.path())
             .filter(|path| allow_hidden || !path.is_hidden())
-            .filter(|path| !(path.is_dir() && depth == 0))
+            .filter(|path| !(path.is_dir() && matches!(depth, Some(0))))
             .flat_map_if(
                 |path| path.is_dir(),
-                |path| traverse_dir(path, depth - 1, allow_hidden).into_iter(),
+                |path| {
+                    traverse_dir(path, depth.map(|dp| dp - 1), allow_hidden)
+                        .into_iter()
+                },
             )
             .collect(),
         Err(err) => {
