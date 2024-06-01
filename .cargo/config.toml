@@ -22,11 +22,8 @@ rustflags = [
   "-Aclippy::redundant_pub_crate",              # prefer to be explicit
   "-Aclippy::single_call_fn",                   # function only called once
   ## Maybe remove ##
-  "-Aclippy::single_char_lifetime_names",       # common practice to use 'a
-  "-Aclippy::ref_patterns",                     # dunno if/how it can be removed
+  "-Aclippy::unneeded_field_pattern",            # prefer to be exhaustive
   ## Will remove ##
   "-Aclippy::missing_docs_in_private_items",
   "-Aclippy::missing_errors_doc",
-  "-Aclippy::missing_panics_doc",
-  "-Aclippy::use_debug",
 ]
