@@ -23,7 +23,6 @@ pub use self::{
 pub struct Options {
     /// Weather to rename the file stem, extension or both.
     #[arg(
-        global = true,
         long, short,
         default_value = "both",
         value_parser = PossibleValuesParser::new(["stem", "extension", "both"])

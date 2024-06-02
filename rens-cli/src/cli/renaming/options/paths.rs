@@ -6,7 +6,6 @@ use clap::{ArgAction, Args};
 pub struct Options {
     /// Canonicalize all paths instead of using relative ones.
     #[arg(
-        global = true,
         long,
         default_value_t = false,
         action = ArgAction::SetTrue

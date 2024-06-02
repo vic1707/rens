@@ -5,7 +5,6 @@ use clap::{Args, ValueEnum};
 pub struct Confirmations {
     /// Behavior when a renamed file already exists.
     #[arg(
-        global = true,
         long,
         value_enum,
         default_value = "ask",
@@ -17,7 +16,6 @@ pub struct Confirmations {
 
     /// Behavior when upon effective renaming.
     #[arg(
-        global = true,
         long,
         value_enum,
         default_value = "each",

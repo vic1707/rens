@@ -7,7 +7,6 @@ pub struct Recursion {
     ///
     /// Note: implied if --depth is used.
     #[arg(
-        global = true,
         long, short,
         default_value_t = false,
         default_value_if("depth", ArgPredicate::IsPresent, "true"),
@@ -16,13 +15,12 @@ pub struct Recursion {
     pub recursive: bool,
 
     /// If recursive mode is enabled, decides how deep the renaming goes.
-    #[arg(global = true, long, value_name = "depth")]
+    #[arg(long, value_name = "depth")]
     // Note: None gets used as `As deep as possible`.
     pub depth: Option<usize>,
 
     /// When traversing directories, include hidden files.
     #[arg(
-        global = true,
         long, short,
         default_value_t = false,
         action = ArgAction::SetTrue,

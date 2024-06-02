@@ -13,7 +13,7 @@ pub struct Options {
     pub case_insensitive: bool,
 
     /// Number of replacements to be done.
-    #[arg(global = true, long, short, value_name = "number of repetitions")]
+    #[arg(long, short, value_name = "number of repetitions")]
     // Note: None gets used as `All`.
     pub occurence: Option<NonZeroUsize>,
 }
