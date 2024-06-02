@@ -1,9 +1,11 @@
 /* Modules */
 pub mod renaming;
+/* Built-in imports */
+use std::path::PathBuf;
 /* Crate imports */
 use renaming::Mode;
 /* Dependencies */
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueHint};
 use clap_verbosity_flag::Verbosity;
 
 #[derive(Debug, Parser)]
@@ -24,6 +26,14 @@ pub enum Commands {
     Completions {
         /// The shell to generate the completions for
         shell: clap_complete_command::Shell,
+    },
+    /// Generate man page
+    Man {
+        /// The dir path to generate man-pages to.
+        ///
+        /// Note: Will get created if doesn't exist.
+        #[arg(value_hint = ValueHint::DirPath)]
+        path: PathBuf,
     },
 }
 

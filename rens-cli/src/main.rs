@@ -3,7 +3,7 @@
 mod cli;
 mod utils;
 /* Built-in imports */
-use std::io;
+use std::{fs, io};
 /* Crate imports */
 use cli::{
     renaming::{ConfirmOption, Options},
@@ -19,7 +19,8 @@ use rens_common::{
 };
 use tap::{Pipe, Tap};
 
-fn main() {
+#[allow(clippy::too_many_lines)]
+fn main() -> anyhow::Result<()> {
     let Cli {
         command,
         verbose: _,
@@ -33,6 +34,21 @@ fn main() {
     match command {
         Commands::Completions { shell } => {
             shell.generate(&mut Cli::command(), &mut io::stdout());
+        },
+        Commands::Man { path } => {
+            let command = Cli::command();
+            if !path.exists() {
+                fs::create_dir_all(&path)?;
+            }
+
+            for subcommand in command.get_subcommands() {
+                let subcommand_filename =
+                    format!("{}-{}", command.get_name(), subcommand.get_name());
+                let cmd = subcommand.clone().name(subcommand_filename);
+                clap_mangen::Man::new(cmd).generate_to(&path)?;
+            }
+
+            clap_mangen::Man::new(command).generate_to(path)?;
         },
         Commands::Renaming(mode) => {
             let (
@@ -101,7 +117,8 @@ fn main() {
             if confirmations.confirm == ConfirmOption::Once
                 && !ask_for_confirm("All good ?")
             {
-                return println!("Canceled...");
+                println!("Canceled...");
+                return Ok(());
             }
 
             files
@@ -119,4 +136,6 @@ fn main() {
                 .for_each(|err| error!("{err}"));
         },
     }
+
+    Ok(())
 }
