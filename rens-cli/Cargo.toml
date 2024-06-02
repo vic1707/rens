@@ -2,7 +2,7 @@
 name = "rens-cli"
 version = "0.0.0"
 edition = "2021"
-rust-version = "1.74.1"
+rust-version = "1.75.0"
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
