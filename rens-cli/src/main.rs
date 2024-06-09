@@ -14,7 +14,7 @@ use utils::{ask_for_confirm, traverse_dir};
 use clap::{CommandFactory, Parser};
 use log::{debug, error};
 use rens_common::{
-    traits::{IteratorExt, ResultIteratorExt},
+    traits::{BoolExt, IteratorExt, ResultIteratorExt},
     File,
 };
 use tap::{Pipe, Tap};
@@ -92,11 +92,9 @@ fn main() -> anyhow::Result<()> {
                 .filter_map_ok(|err| error!("{err}"))
                 // Filter those for which nothing needs to be done
                 .filter(|file| {
-                    let will_rename = file.needs_rename(&strategy, target);
-                    if !will_rename {
+                    file.needs_rename(&strategy, target).tap_if_false(|| {
                         println!("Nothing to do for {}", file.path().display());
-                    }
-                    will_rename
+                    })
                 })
                 // Log every rename that can be done
                 .tap_for_each(|file| {
