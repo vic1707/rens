@@ -12,7 +12,7 @@ use cli::{
 use utils::{ask_for_confirm, traverse_dir};
 /* Dependencies */
 use clap::{CommandFactory, Parser};
-use log::{debug, error};
+use log::{debug, error, info};
 use rens_common::{
     traits::{BoolExt, IteratorExt, ResultIteratorExt},
     File,
@@ -93,7 +93,7 @@ fn main() -> anyhow::Result<()> {
                 // Filter those for which nothing needs to be done
                 .filter(|file| {
                     file.needs_rename(&strategy, target).tap_if_false(|| {
-                        println!("Nothing to do for {}", file.path().display());
+                        info!("Nothing to do for {}", file.path().display());
                     })
                 })
                 // Log every rename that can be done
