@@ -111,6 +111,11 @@ fn main() -> anyhow::Result<()> {
                 })
                 .pipe(Iterator::collect::<Vec<_>>);
 
+            if files.is_empty() {
+                println!("Nothing to do...");
+                return Ok(());
+            }
+
             // If needed, ask for global confirmation
             if confirmations.confirm == ConfirmOption::Once
                 && !ask_for_confirm("All good ?")
