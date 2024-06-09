@@ -8,7 +8,7 @@ use std::{io, path::PathBuf};
 /* Dependencies */
 use clap::{
     builder::{PossibleValuesParser, TypedValueParser},
-    Args, ValueHint,
+    ArgAction, Args, ValueHint,
 };
 use rens_common::RenameTarget;
 /* Re-exports */
@@ -41,6 +41,15 @@ pub struct Options {
 
     #[command(flatten)]
     pub pattern_opt: PattenrOpt,
+
+    #[arg(
+        name = "ignore",
+        long, short,
+        default_value_t = false,
+        action = ArgAction::SetTrue,
+    )]
+    /// Parse and follow `.gitignore` (local and global), `.ignore` and `.git/info/exclude` files.
+    pub auto_ignore: bool,
 
     /// Paths to the elements you want to rename.
     #[arg(

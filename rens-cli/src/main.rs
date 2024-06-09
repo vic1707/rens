@@ -9,9 +9,10 @@ use cli::{
     renaming::{ConfirmOption, Options},
     Cli, Commands,
 };
-use utils::{ask_for_confirm, traverse_dir};
+use utils::ask_for_confirm;
 /* Dependencies */
 use clap::{CommandFactory, Parser};
+use ignore::{overrides::OverrideBuilder, WalkBuilder};
 use log::{debug, error, info};
 use rens_common::{
     traits::{BoolExt, IteratorExt, ResultIteratorExt},
@@ -54,6 +55,7 @@ fn main() -> anyhow::Result<()> {
             let (
                 strategy,
                 Options {
+                    auto_ignore,
                     confirmations,
                     paths_opt,
                     recursion,
@@ -71,12 +73,38 @@ fn main() -> anyhow::Result<()> {
                 .flat_map_if(
                     |path| path.is_dir(),
                     |path| {
-                        traverse_dir(
-                            path,
-                            recursion.depth,
-                            recursion.allow_hidden,
-                        )
-                        .into_iter()
+                        WalkBuilder::new(&path)
+                            .hidden(recursion.allow_hidden)
+                            .max_depth(recursion.depth)
+                            .require_git(false) // dunno
+                            .git_exclude(auto_ignore)
+                            .git_global(auto_ignore)
+                            .git_ignore(auto_ignore)
+                            .ignore(auto_ignore)
+                            // assume that parsing ignore files also
+                            // means that we want to ignore the `.git` dir and `.gitignore` files themselves
+                            .pipe(
+                                #[allow(clippy::expect_used)]
+                                |builder| {
+                                    if auto_ignore {
+                                        builder.overrides(
+                                            OverrideBuilder::new(path)
+                                                .add("!/.git/")
+                                                .expect("unreachable")
+                                                .add("!/.gitignore")
+                                                .expect("unreachable")
+                                                .build()
+                                                .expect("unreachable"),
+                                        )
+                                    } else {
+                                        builder
+                                    }
+                                },
+                            )
+                            .build()
+                            .filter_map_ok(|err| error!("{err}"))
+                            .map(|dir_entry| dir_entry.path().to_path_buf())
+                            .filter(|path| !path.is_dir())
                     },
                 )
                 .map_if(
