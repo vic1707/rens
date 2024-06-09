@@ -79,14 +79,13 @@ impl Name {
 
     #[inline]
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
-        let stem = path
-            .as_ref()
+        let file_path = path.as_ref();
+        let stem = file_path
             .file_stem()
             .and_then(OsStr::to_str)
             .map(ToString::to_string)
-            .ok_or(Error::NoFileStem)?;
-        let extension = path
-            .as_ref()
+            .ok_or(Error::NoFileStem(file_path.to_path_buf()))?;
+        let extension = file_path
             .extension()
             .and_then(OsStr::to_str)
             .map(ToString::to_string);
@@ -131,7 +130,10 @@ impl File {
     // Can't use TryFrom because it conflicts with Into, I'm sad.
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
         let file_path = path.as_ref();
-        let parent = file_path.parent().ok_or(Error::NoParent)?.to_path_buf();
+        let parent = file_path
+            .parent()
+            .ok_or(Error::NoParent(file_path.to_path_buf()))?
+            .to_path_buf();
         let kind = file_path.kind()?;
         let name = Name::from_path(file_path)?;
 
@@ -196,10 +198,10 @@ impl fmt::Display for Name {
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
-    #[error("Given path doesn't have a filestem.")]
-    NoFileStem,
-    #[error("Given path doesn't have a parent folder.")]
-    NoParent,
+    #[error("{0} doesn't have a filestem.")]
+    NoFileStem(PathBuf),
+    #[error("{0} doesn't have a parent folder.")]
+    NoParent(PathBuf),
     #[error("io::Error: {0}")]
     Io(#[from] io::Error),
 }
