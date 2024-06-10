@@ -15,7 +15,7 @@ use rens_common::RenameTarget;
 pub use self::{
     confirmations::{ConfirmOption, Confirmations, OverrideOption},
     paths::Options as PathsOpt,
-    pattern::Options as PattenrOpt,
+    pattern::Options as PatternOpt,
     recursion::Recursion,
 };
 
@@ -40,7 +40,7 @@ pub struct Options {
     pub paths_opt: PathsOpt,
 
     #[command(flatten)]
-    pub pattern_opt: PattenrOpt,
+    pub pattern_opt: PatternOpt,
 
     #[arg(
         name = "ignore",
