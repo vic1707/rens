@@ -6,10 +6,7 @@ mod recursion;
 /* Built-in imports */
 use std::{io, path::PathBuf};
 /* Dependencies */
-use clap::{
-    builder::{PossibleValuesParser, TypedValueParser},
-    ArgAction, Args, ValueHint,
-};
+use clap::{ArgAction, Args, ValueHint};
 use rens_common::RenameTarget;
 /* Re-exports */
 pub use self::{
@@ -24,12 +21,7 @@ pub struct Options {
     /// Weather to rename the file stem, extension or both.
     ///
     /// Note: filename = <stem>.<extension>
-    #[arg(
-        long, short,
-        default_value = "both",
-        value_parser = PossibleValuesParser::new(["stem", "extension", "both"])
-            .map(|s| s.parse::<RenameTarget>().unwrap())
-    )]
+    #[arg(long, short, default_value = "both", value_enum)]
     pub target: RenameTarget,
 
     #[command(flatten)]
@@ -81,7 +73,7 @@ mod tests {
     use super::*;
     use clap::{CommandFactory, Parser};
 
-    #[derive(Parser)]
+    #[derive(Debug, Parser)]
     struct TestParser {
         #[command(flatten)]
         pub options: Options,
@@ -90,5 +82,31 @@ mod tests {
     #[test]
     fn verify_conformity() {
         TestParser::command().debug_assert();
+    }
+
+    #[test]
+    fn test_target() {
+        TestParser::try_parse_from(["rens-cli", "--target", "."]).unwrap_err();
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--target=both", "."])
+                .options
+                .target,
+            RenameTarget::Both
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--target=extension", "."])
+                .options
+                .target,
+            RenameTarget::Extension
+        );
+
+        assert_eq!(
+            TestParser::parse_from(["rens-cli", "--target=stem", "."])
+                .options
+                .target,
+            RenameTarget::Stem
+        );
     }
 }

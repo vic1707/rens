@@ -206,7 +206,7 @@ pub enum Error {
     Io(#[from] io::Error),
 }
 
-#[derive(Debug, Default, Display, Clone, Copy, FromStr)]
+#[derive(Debug, Default, Display, Clone, Copy, FromStr, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum RenameTarget {
     /// File stem is the filename without the extension
