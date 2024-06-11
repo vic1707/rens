@@ -23,7 +23,7 @@ pub enum Mode {
     #[command(alias = "re")]
     Regex {
         /// The regex pattern you're looking to rename.
-        /// 
+        ///
         /// Must comply with the `regex` crate syntax.
         pattern: Regex,
         /// The string you with to replace it with.

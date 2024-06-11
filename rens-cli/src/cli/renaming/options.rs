@@ -22,6 +22,8 @@ pub use self::{
 #[derive(Debug, Args)]
 pub struct Options {
     /// Weather to rename the file stem, extension or both.
+    ///
+    /// Note: filename = <stem>.<extension>
     #[arg(
         long, short,
         default_value = "both",
