@@ -18,7 +18,7 @@ mod tests {
     use super::*;
     use clap::{CommandFactory, Parser};
 
-    #[derive(Parser)]
+    #[derive(Debug, Parser)]
     struct TestParser {
         #[command(flatten)]
         pub options: Options,
