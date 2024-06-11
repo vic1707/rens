@@ -1,7 +1,7 @@
 /* Built-in imports */
 use std::io::{self, Write};
 /* Crate imports */
-use crate::cli::renaming::OverrideOption;
+use crate::cli::renaming::options::OverrideOption;
 
 #[allow(clippy::expect_used)]
 pub fn ask_for_confirm(prompt: &str) -> bool {

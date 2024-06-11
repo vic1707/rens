@@ -2,6 +2,7 @@
 use clap::{Args, ValueEnum};
 
 #[derive(Debug, Args)]
+#[command(next_help_heading = "Confirmation Options")]
 pub struct Confirmations {
     /// Behavior when a renamed file already exists.
     #[arg(

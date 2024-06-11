@@ -6,7 +6,7 @@ mod utils;
 use std::{fs, io};
 /* Crate imports */
 use cli::{
-    renaming::{ConfirmOption, Options},
+    renaming::options::{ConfirmOption, GitOpt, Options},
     Cli, Commands,
 };
 use utils::ask_for_confirm;
@@ -55,7 +55,7 @@ fn main() -> anyhow::Result<()> {
             let (
                 strategy,
                 Options {
-                    auto_ignore,
+                    git_opt: GitOpt { auto_ignore },
                     confirmations,
                     paths_opt,
                     recursion,

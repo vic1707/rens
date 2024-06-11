@@ -2,16 +2,17 @@
 use clap::{ArgAction, Args};
 
 #[derive(Debug, Args)]
-#[group(id = "path_options")]
-#[command(next_help_heading = "Path Options")]
+#[group(id = "git_options")]
+#[command(next_help_heading = "Git integration Options", display_order = 0)]
 pub struct Options {
-    /// Canonicalize all paths instead of using relative ones.
     #[arg(
-        long,
+        name = "ignore",
+        long, short,
         default_value_t = false,
-        action = ArgAction::SetTrue
+        action = ArgAction::SetTrue,
     )]
-    pub canonicalize_paths: bool,
+    /// Parse and follow `.gitignore` (local and global), `.ignore` and `.git/info/exclude` files.
+    pub auto_ignore: bool,
 }
 
 #[cfg(test)]

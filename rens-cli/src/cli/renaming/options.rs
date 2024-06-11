@@ -1,49 +1,31 @@
 /* Modules */
 mod confirmations;
+mod git;
 mod paths;
 mod pattern;
 mod recursion;
 /* Built-in imports */
 use std::{io, path::PathBuf};
 /* Dependencies */
-use clap::{ArgAction, Args, ValueHint};
+use clap::{Args, ValueHint};
 use rens_common::RenameTarget;
 /* Re-exports */
 pub use self::{
     confirmations::{ConfirmOption, Confirmations, OverrideOption},
+    git::Options as GitOpt,
     paths::Options as PathsOpt,
     pattern::Options as PatternOpt,
     recursion::Recursion,
 };
 
 #[derive(Debug, Args)]
+#[command(next_display_order = 0)]
 pub struct Options {
-    /// Weather to rename the file stem, extension or both.
+    /// Wether to rename the file stem, extension or both.
     ///
     /// Note: filename = <stem>.<extension>
     #[arg(long, short, default_value = "both", value_enum)]
     pub target: RenameTarget,
-
-    #[command(flatten)]
-    pub recursion: Recursion,
-
-    #[command(flatten)]
-    pub confirmations: Confirmations,
-
-    #[command(flatten)]
-    pub paths_opt: PathsOpt,
-
-    #[command(flatten)]
-    pub pattern_opt: PatternOpt,
-
-    #[arg(
-        name = "ignore",
-        long, short,
-        default_value_t = false,
-        action = ArgAction::SetTrue,
-    )]
-    /// Parse and follow `.gitignore` (local and global), `.ignore` and `.git/info/exclude` files.
-    pub auto_ignore: bool,
 
     /// Paths to the elements you want to rename.
     #[arg(
@@ -52,6 +34,21 @@ pub struct Options {
         value_hint = ValueHint::AnyPath,
     )]
     pub paths: Vec<PathBuf>,
+
+    #[command(flatten)]
+    pub confirmations: Confirmations,
+
+    #[command(flatten)]
+    pub git_opt: GitOpt,
+
+    #[command(flatten)]
+    pub paths_opt: PathsOpt,
+
+    #[command(flatten)]
+    pub pattern_opt: PatternOpt,
+
+    #[command(flatten)]
+    pub recursion: Recursion,
 }
 
 fn path_exists(input: &str) -> io::Result<PathBuf> {

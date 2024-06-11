@@ -2,7 +2,21 @@
 use clap::{builder::ArgPredicate, ArgAction, Args};
 
 #[derive(Debug, Args)]
+#[command(next_help_heading = "Recursion Options")]
 pub struct Recursion {
+    /// When traversing directories, include hidden files.
+    #[arg(
+        long, short,
+        default_value_t = false,
+        action = ArgAction::SetTrue,
+    )]
+    pub allow_hidden: bool,
+
+    /// If recursive mode is enabled, decides how deep the renaming goes.
+    #[arg(long, value_name = "depth")]
+    // Note: None gets used as `As deep as possible`.
+    pub depth: Option<usize>,
+
     /// Decides if folder paths includes their children recursively.
     ///
     /// Note: implied if --depth is used.
@@ -13,19 +27,6 @@ pub struct Recursion {
         action = ArgAction::SetTrue,
     )]
     pub recursive: bool,
-
-    /// If recursive mode is enabled, decides how deep the renaming goes.
-    #[arg(long, value_name = "depth")]
-    // Note: None gets used as `As deep as possible`.
-    pub depth: Option<usize>,
-
-    /// When traversing directories, include hidden files.
-    #[arg(
-        long, short,
-        default_value_t = false,
-        action = ArgAction::SetTrue,
-    )]
-    pub allow_hidden: bool,
 }
 
 #[cfg(test)]

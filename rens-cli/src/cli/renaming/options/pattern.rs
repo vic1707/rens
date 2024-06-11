@@ -4,9 +4,10 @@ use core::num::NonZeroUsize;
 use clap::Args;
 
 #[derive(Debug, Args)]
-#[group(skip)]
+#[group(id = "pattern_options")]
+#[command(next_help_heading = "Pattern Options")]
 pub struct Options {
-    /// Weather or not the pattern should be made case sensitive.
+    /// Wether or not the pattern should be made case sensitive.
     ///
     /// Note: No effect if regex pattern already includes case settings at its beggining.
     #[arg(long, default_value_t = false)]
