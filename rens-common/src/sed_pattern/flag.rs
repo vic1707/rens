@@ -1,5 +1,5 @@
 /* Built-in imports */
-use core::{iter::Peekable, num::ParseIntError, str::Chars};
+use core::{iter::Peekable, str::Chars};
 
 /// A single regex flag.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,19 +25,13 @@ impl Flag {
         let mut flags = Vec::new();
 
         while let Some(ch) = chars.next() {
-            if ch.is_numeric() {
-                let mut num_str = ch.to_string();
-
-                while let Some(&next_c) = chars.peek() {
-                    if next_c.is_numeric() {
-                        num_str.push(next_c);
-                        chars.next();
-                    } else {
-                        break;
-                    }
-                }
-
-                flags.push(Self::Numbered(num_str.parse::<usize>()?));
+            if ch.is_ascii_digit() {
+                let num = 10 * char_to_digit(ch)
+                    + chars
+                        .next_if(char::is_ascii_digit)
+                        .into_iter()
+                        .fold(0, |acc, cur| acc * 10 + char_to_digit(cur));
+                flags.push(Self::Numbered(num));
             } else {
                 flags.push(Self::try_from(ch)?);
             }
@@ -47,12 +41,17 @@ impl Flag {
     }
 }
 
+#[inline]
+#[allow(clippy::as_conversions)]
+fn char_to_digit(ch: char) -> usize {
+    debug_assert!(ch.is_ascii_digit(), "ch is not in '0'..'9'");
+    usize::from(ch as u8 - b'0')
+}
+
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum Error {
     #[error("Unknown sed flag: {0}")]
     UnknownFlag(char),
-    #[error("{0}")]
-    ParseIntError(#[from] ParseIntError),
 }
 
 impl TryFrom<char> for Flag {
