@@ -45,9 +45,6 @@ pub struct Options {
     pub paths_opt: PathsOpt,
 
     #[command(flatten)]
-    pub pattern_opt: PatternOpt,
-
-    #[command(flatten)]
     pub recursion: Recursion,
 }
 

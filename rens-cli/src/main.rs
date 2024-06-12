@@ -61,7 +61,6 @@ fn main() -> anyhow::Result<()> {
                     recursion,
                     target,
                     paths,
-                    pattern_opt: _,
                 },
             ) = mode.get_strategy_and_options();
 
