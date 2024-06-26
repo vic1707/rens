@@ -1,3 +1,14 @@
 [workspace]
 members = ["rens-cli", "rens-common", "rens-tui"]
 resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1.0.86"
+clap = { version = "4.5.7", features = ["derive", "string"] }
+clap-verbosity-flag = "2.2.0"
+clap_complete_command = "0.5.1"
+clap_mangen = "0.2.21"
+env_logger = "0.11.3"
+log = "0.4.21"
+regex = "1.10.5"
+thiserror = "1.0.61"
