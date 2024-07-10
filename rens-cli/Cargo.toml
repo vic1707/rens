@@ -16,5 +16,5 @@ ignore = "0.4.22"
 log = { workspace = true }
 regex =  { workspace = true }
 rens-common = { path = "../rens-common" }
-tap = "1.0.1"
+tap = { workspace = true }
 thiserror = { workspace = true }
