@@ -1,4 +1,3 @@
-#![allow(clippy::shadow_unrelated)]
 /* Modules */
 mod cli;
 mod utils;
@@ -37,19 +36,19 @@ fn main() -> anyhow::Result<()> {
             shell.generate(&mut Cli::command(), &mut io::stdout());
         },
         Commands::Man { path } => {
-            let command = Cli::command();
+            let cmd = Cli::command();
             if !path.exists() {
                 fs::create_dir_all(&path)?;
             }
 
-            for subcommand in command.get_subcommands() {
+            for subcommand in cmd.get_subcommands() {
                 let subcommand_filename =
-                    format!("{}-{}", command.get_name(), subcommand.get_name());
-                let cmd = subcommand.clone().name(subcommand_filename);
-                clap_mangen::Man::new(cmd).generate_to(&path)?;
+                    format!("{}-{}", cmd.get_name(), subcommand.get_name());
+                let sub_cmd = subcommand.clone().name(subcommand_filename);
+                clap_mangen::Man::new(sub_cmd).generate_to(&path)?;
             }
 
-            clap_mangen::Man::new(command).generate_to(path)?;
+            clap_mangen::Man::new(cmd).generate_to(path)?;
         },
         Commands::Renaming(mode) => {
             let (
@@ -103,7 +102,7 @@ fn main() -> anyhow::Result<()> {
                             .build()
                             .filter_map_ok(|err| error!("{err}"))
                             .map(|dir_entry| dir_entry.path().to_path_buf())
-                            .filter(|path| !path.is_dir())
+                            .filter(|entry_path| !entry_path.is_dir())
                     },
                 )
                 .map_if(
