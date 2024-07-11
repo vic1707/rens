@@ -10,9 +10,9 @@ clap = { workspace = true }
 clap-verbosity-flag = { workspace = true }
 clap_complete_command = { workspace = true }
 clap_mangen = { workspace = true }
-dunce = "1.0.4"
+dunce = { workspace = true }
 env_logger = { workspace = true }
-ignore = "0.4.22"
+ignore = { workspace = true }
 log = { workspace = true }
 regex =  { workspace = true }
 rens-common = { path = "../rens-common" }
